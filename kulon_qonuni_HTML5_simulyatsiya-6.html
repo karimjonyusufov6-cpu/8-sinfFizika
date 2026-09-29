@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kulon qonuni — HTML5 interaktiv simulyatsiya</title>
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:linear-gradient(135deg,#eaf4ff,#f8fbff);
+    color:#17324d;
+}
+.container{
+    max-width:1000px;
+    margin:0 auto;
+    padding:20px;
+}
+h1{text-align:center;color:#0b4f8a;margin:5px 0 8px}
+.subtitle{text-align:center;margin-bottom:20px;color:#52697d}
+.card{
+    background:white;
+    border-radius:18px;
+    padding:20px;
+    margin:16px 0;
+    box-shadow:0 6px 22px rgba(0,0,0,.10);
+}
+.controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+.control-box{
+    border:1px solid #d6e4f0;
+    border-radius:14px;
+    padding:15px;
+}
+button{
+    border:0;
+    border-radius:10px;
+    padding:12px 18px;
+    margin:5px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+}
+.rep{background:#d9ecff;color:#07528e}
+.att{background:#ffe1e1;color:#9a2222}
+.reset{background:#e8e8e8;color:#333}
+input[type=range]{width:100%}
+.value{
+    font-size:20px;
+    font-weight:bold;
+    color:#0b5d9d;
+}
+.formula{
+    background:#f0f7ff;
+    border-left:5px solid #1976d2;
+    padding:15px;
+    border-radius:10px;
+    font-size:22px;
+    text-align:center;
+}
+#scene{
+    width:100%;
+    height:360px;
+    border-radius:16px;
+    background:radial-gradient(circle at center,#ffffff,#edf6ff);
+}
+.info{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+.info div{
+    background:#f6f9fc;
+    padding:14px;
+    border-radius:12px;
+    text-align:center;
+}
+.info strong{display:block;font-size:20px;color:#0b5d9d;margin-bottom:5px}
+ul{line-height:1.8}
+.note{
+    background:#fff8d8;
+    border-left:5px solid #e3b400;
+    padding:14px;
+    border-radius:10px;
+}
+@media(max-width:700px){
+    .controls,.info{grid-template-columns:1fr}
+    #scene{height:300px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>⚡ Zaryadlarning o‘zaro ta’siri</h1>
+<div class="subtitle">8-sinf Fizika — Kulon qonuni | Interaktiv HTML5 simulyatsiya</div>
+
+<div class="card">
+<h2>📐 Kulon qonuni</h2>
+<div class="formula">
+F = k · |q₁ · q₂| / r²
+</div>
+<p><b>F</b> — elektr kuchi (N)</p>
+<p><b>q₁, q₂</b> — elektr zaryadlari (C)</p>
+<p><b>r</b> — zaryadlar orasidagi masofa (m)</p>
+<p><b>k = 9 × 10⁹ N·m²/C²</b> — Kulon doimiysi</p>
+</div>
+
+<div class="card">
+<h2>🎛️ Simulyatsiya boshqaruvi</h2>
+
+<div class="controls">
+<div class="control-box">
+<h3>Masofa: <span id="distanceText" class="value">3.0 m</span></h3>
+<input id="distance" type="range" min="1" max="5" step="0.1" value="3">
+<p>Masofa oshsa, elektr kuchi <b>kamayadi</b>.</p>
+</div>
+
+<div class="control-box">
+<h3>Zaryadlarning turi</h3>
+<button class="rep" onclick="setType('repulsion')">＋ ＋ Itarilish</button>
+<button class="att" onclick="setType('attraction')">＋ − Tortishish</button>
+<button class="reset" onclick="resetSim()">🔄 Qayta boshlash</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>🔬 Jonli simulyatsiya</h2>
+
+<svg id="scene" viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">
+
+<defs>
+<marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto">
+<path d="M0,0 L10,4 L0,8 Z" fill="#1976d2"/>
+</marker>
+<marker id="arrowRed" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto">
+<path d="M0,0 L10,4 L0,8 Z" fill="#d32f2f"/>
+</marker>
+</defs>
+
+<line x1="450" y1="55" x2="450" y2="305" stroke="#b9c9d8" stroke-width="2" stroke-dasharray="8 8"/>
+
+<line id="distanceLine" x1="180" y1="265" x2="720" y2="265"
+      stroke="#607d8b" stroke-width="3"/>
+<text id="distanceSvg" x="450" y="295" text-anchor="middle"
+      font-size="20" fill="#455a64">r = 3.0 m</text>
+
+<circle id="charge1" cx="270" cy="160" r="55" fill="#1976d2"/>
+<circle id="charge2" cx="630" cy="160" r="55" fill="#d32f2f"/>
+
+<text id="q1Text" x="270" y="173" text-anchor="middle"
+      font-size="48" font-weight="bold" fill="white">+</text>
+<text id="q2Text" x="630" y="173" text-anchor="middle"
+      font-size="48" font-weight="bold" fill="white">+</text>
+
+<text x="270" y="90" text-anchor="middle" font-size="20">q₁ = +2 μC</text>
+<text x="630" y="90" text-anchor="middle" font-size="20">q₂ = +3 μC</text>
+
+<line id="force1" x1="210" y1="160" x2="130" y2="160"
+      stroke="#1976d2" stroke-width="7" marker-end="url(#arrowBlue)"/>
+<line id="force2" x1="690" y1="160" x2="770" y2="160"
+      stroke="#d32f2f" stroke-width="7" marker-end="url(#arrowRed)"/>
+
+<text id="stateText" x="450" y="335" text-anchor="middle"
+      font-size="22" font-weight="bold">Zaryadlar bir-birini itaradi</text>
+
+</svg>
+
+<div class="info">
+<div>
+<strong id="forceValue">0.0060 N</strong>
+Elektr kuchi F
+</div>
+<div>
+<strong id="distanceValue">3.0 m</strong>
+Masofa r
+</div>
+<div>
+<strong id="typeValue">Itarilish</strong>
+Ta’sir turi
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>📚 Tajriba mazmuni</h2>
+<p>
+Charlz-Ogyusten Kulon burama tarozi yordamida elektr zaryadlari orasidagi
+o‘zaro ta’sir kuchini tajribada o‘rgangan.
+</p>
+<ul>
+<li>Zaryadlar bir xil ishorali bo‘lsa — <b>itarishadi</b>.</li>
+<li>Zaryadlar qarama-qarshi ishorali bo‘lsa — <b>tortishadi</b>.</li>
+<li>Zaryad miqdori oshsa, kuch ham oshadi.</li>
+<li>Masofa 2 marta oshsa, kuch 4 marta kamayadi.</li>
+<li>Masofa 3 marta oshsa, kuch 9 marta kamayadi.</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>🧠 Eslab qoling!</h2>
+<div class="note">
+<b>Kulon qonuni:</b> ikki nuqtaviy zaryad orasidagi o‘zaro ta’sir kuchi
+zaryadlar ko‘paytmasiga to‘g‘ri, ular orasidagi masofaning kvadratiga
+teskari proporsional.
+</div>
+</div>
+
+</div>
+
+<script>
+const k = 9e9;
+const q1 = 2e-6;
+const q2 = 3e-6;
+
+let type = "repulsion";
+
+const distanceSlider = document.getElementById("distance");
+const distanceText = document.getElementById("distanceText");
+const distanceValue = document.getElementById("distanceValue");
+const forceValue = document.getElementById("forceValue");
+const typeValue = document.getElementById("typeValue");
+const distanceSvg = document.getElementById("distanceSvg");
+const charge1 = document.getElementById("charge1");
+const charge2 = document.getElementById("charge2");
+const q2Text = document.getElementById("q2Text");
+const force1 = document.getElementById("force1");
+const force2 = document.getElementById("force2");
+const stateText = document.getElementById("stateText");
+
+function update(){
+    const r = parseFloat(distanceSlider.value);
+
+    const F = k * Math.abs(q1*q2) / (r*r);
+
+    distanceText.textContent = r.toFixed(1) + " m";
+    distanceValue.textContent = r.toFixed(1) + " m";
+    distanceSvg.textContent = "r = " + r.toFixed(1) + " m";
+    forceValue.textContent = F.toFixed(4) + " N";
+
+    // Zaryadlarning ekrandagi joylashuvi masofaga mos ravishda o'zgaradi
+    const center = 450;
+    const half = 100 + (r-1)*65;
+    const x1 = center - half;
+    const x2 = center + half;
+
+    charge1.setAttribute("cx", x1);
+    charge2.setAttribute("cx", x2);
+
+    document.querySelector('text[x="270"]').setAttribute("x",x1);
+    document.querySelector('text[x="630"]').setAttribute("x",x2);
+
+    document.getElementById("q1Text").setAttribute("x",x1);
+    q2Text.setAttribute("x",x2);
+
+    // Kuch strelkalari
+    if(type === "repulsion"){
+        force1.setAttribute("x1",x1-55);
+        force1.setAttribute("x2",x1-120);
+        force2.setAttribute("x1",x2+55);
+        force2.setAttribute("x2",x2+120);
+    }else{
+        force1.setAttribute("x1",x1-55);
+        force1.setAttribute("x2",x1+25);
+        force2.setAttribute("x1",x2+55);
+        force2.setAttribute("x2",x2-25);
+    }
+}
+
+function setType(newType){
+    type = newType;
+
+    if(type === "repulsion"){
+        q2Text.textContent = "+";
+        charge2.setAttribute("fill","#d32f2f");
+        typeValue.textContent = "Itarilish";
+        stateText.textContent = "Zaryadlar bir-birini itaradi";
+        stateText.setAttribute("fill","#1976d2");
+    }else{
+        q2Text.textContent = "−";
+        charge2.setAttribute("fill","#8e44ad");
+        typeValue.textContent = "Tortishish";
+        stateText.textContent = "Zaryadlar bir-birini tortadi";
+        stateText.setAttribute("fill","#8e44ad");
+    }
+
+    update();
+}
+
+function resetSim(){
+    distanceSlider.value = 3;
+    setType("repulsion");
+}
+
+distanceSlider.addEventListener("input", update);
+
+update();
+</script>
+
+</body>
+</html>
